@@ -134,6 +134,14 @@ is a failed download in someone's dashboard.
 
 ## Status
 
-The gap this closes has been reported upstream. If Jellyfin registers the id itself, this
-plugin becomes redundant - which is the right shape for something that exists because of a
-missing registration.
+Both halves of this are reported upstream, and both are open:
+
+- [#17769](https://github.com/jellyfin/jellyfin/issues/17769) - `MetadataProvider.Custom` is
+  documented as the merge override but cannot be set from an NFO. That is the gap this plugin
+  closes. If Jellyfin registers the id itself, the plugin becomes redundant, which is the
+  right shape for something that exists because of a missing registration.
+- [#17770](https://github.com/jellyfin/jellyfin/issues/17770) - two unrelated series merge
+  silently when their TVDB ids happen to match a placeholder value. That is the failure this
+  was found through, and it is **not** what the plugin fixes: `<customid>` hands you a lever,
+  it does not make the raw grouping key plausible or the merge visible in the log. A `-1` in
+  two `<tvdbid>` elements still collapses two series into one.

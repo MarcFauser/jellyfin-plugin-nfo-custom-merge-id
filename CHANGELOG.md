@@ -74,6 +74,15 @@ The major version encodes the Jellyfin line a build belongs to: **11.x** for Jel
       the package checks, so it aborts first and the new check never runs. A red run proves
       the guard that actually fired, which is not necessarily the one under test.
 
+- **The upstream reports are linked rather than asserted.**
+  [#17769](https://github.com/jellyfin/jellyfin/issues/17769) is the gap this plugin closes -
+  `MetadataProvider.Custom` documented as the merge override and unreachable from an NFO.
+  [#17770](https://github.com/jellyfin/jellyfin/issues/17770) is the failure it was found
+  through, and it is deliberately named as one this plugin does **not** fix: `<customid>`
+  hands an owner a lever, it does not make the raw grouping key plausible or the merge
+  visible in the log. Both open. A claim of "reported upstream" that cannot be looked up is
+  indistinguishable from an unsupported one.
+
 ### Fixed
 - **The `pre-commit` hook could not fire.** It came over with the rest of the scaffolding
   and its path filter still read `^Jellyfin\.Plugin\.JFLint/.*\.(cs|csproj)$` - a path this

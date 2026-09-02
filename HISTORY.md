@@ -80,6 +80,14 @@ members, no server change. The key has to be exactly `Custom`, because that is t
 grouping code reads - a friendlier `CustomMerge` would give a readable `<custommergeid>`
 that nothing ever looks at.
 
-The same three lines would be the fix upstream, and the gap has been reported. Until it
-lands, this plugin closes it; afterwards it becomes redundant, which is the right shape for
-a plugin that exists because of a missing registration.
+The same three lines would be the fix upstream, and the gap is reported as
+[#17769](https://github.com/jellyfin/jellyfin/issues/17769). Until it lands, this plugin
+closes it; afterwards it becomes redundant, which is the right shape for a plugin that
+exists because of a missing registration.
+
+The failure that led here is filed separately as
+[#17770](https://github.com/jellyfin/jellyfin/issues/17770), because it is a different bug
+and this plugin does not fix it: series are grouped on the raw value of a provider id, with
+no plausibility check and no log line. `<customid>` gives an owner a way to override that
+decision from disk - it does not stop two `-1` values from silently becoming one series for
+anyone who never hears of this plugin. Both were filed on 2026-09-02 and both are open.
