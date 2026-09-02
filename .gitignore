@@ -12,3 +12,6 @@ tmp/
 *.user
 .vs/
 .idea/
+
+# Drafts for upstream issues, kept locally until they are actually filed
+BUGREPORT-*.md
