@@ -60,9 +60,19 @@ The major version encodes the Jellyfin line a build belongs to: **11.x** for Jel
     description; `jellyfin-web` on `release-10.11.z` renders it as plain JSX text in
     `plugin.tsx`, so React escapes it rather than swallowing it as an unknown tag.
   - **One check added beyond the inherited set**, and forced to fire rather than trusted:
-    every assembly named in `meta.json` must be present in the package. Pointed at a
-    deliberately missing name it aborts; on the real build it passes. A typo there would
+    every assembly named in `meta.json` must be present in the package. A typo there would
     otherwise produce a plugin that installs and then does nothing.
+    - **Exercised in isolation against the real artifact**, with the check lifted out of the
+      shipped `build.ps1` rather than copied: the true name passes, an invented one aborts,
+      a realistic typo (`…NfoCustomMergeI.dll`) aborts - and so does
+      `…NfoCustomMergeId.Missing.dll`, which is the case that matters. That name *satisfies*
+      check 6, because check 6 is a prefix filter (`-notlike 'Jellyfin.Plugin.NfoCustomMergeId.*'`)
+      while check 7 compares exactly. The two are therefore independent rather than one
+      restating the other.
+    - Running the full build to break it does not work: changing `assemblies` changes
+      `meta.json`, hence the ZIP, hence its checksum - and the checksum guard sits *before*
+      the package checks, so it aborts first and the new check never runs. A red run proves
+      the guard that actually fired, which is not necessarily the one under test.
 
 ### Fixed
 - **The `pre-commit` hook could not fire.** It came over with the rest of the scaffolding
