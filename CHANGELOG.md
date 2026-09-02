@@ -39,3 +39,15 @@ The major version encodes the Jellyfin line a build belongs to: **11.x** for Jel
   into one `tvshow.nfo` with three distinguishable values, plus a `<zap2itid>`. After the
   refresh the Zap2It value was on the item and none of the other three were - so the file
   was read, and the three were genuinely ignored rather than the file skipped.
+
+### Fixed
+- **The `pre-commit` hook could not fire.** It came over with the rest of the scaffolding
+  and its path filter still read `^Jellyfin\.Plugin\.JFLint/.*\.(cs|csproj)$` - a path this
+  repository does not contain, so the guard exited 0 on every commit and the changelog it
+  enforces was never actually enforced. It had no chance to be noticed either: the first
+  commit carried a changelog anyway and the second touched no source.
+  - **Forced to fire rather than read as correct**, all four directions in a throwaway
+    repository: with the repaired filter a source-only commit aborts, a commit carrying
+    `CHANGELOG.md` passes, and a commit touching only `README.md` is not intercepted - while
+    the old hook lets that first case through. The last of the four is the one that turns
+    "the hook is now right" into "the hook was wrong".
