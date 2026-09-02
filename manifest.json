@@ -1,0 +1,28 @@
+[
+  {
+    "guid": "b7f4c2a1-5e93-4d68-9c07-3a1f8e2d6b40",
+    "name": "NFO Custom Merge ID",
+    "description": "Jellyfin groups series across release folders by MetadataProvider.Custom, ahead of TVDB and IMDb, but nothing registers that id - so a <customid> element in a tvshow.nfo is dropped without a word. This plugin registers it. Two release folders can then be forced apart or held together from disk, and the decision survives a rebuild of the database.",
+    "overview": "Makes <customid> readable from a tvshow.nfo, so series grouping is decided on disk.",
+    "owner": "Marc Fauser",
+    "category": "MoviesAndShows",
+    "versions": [
+      {
+        "version": "12.0.0.0",
+        "targetAbi": "12.0.0.0",
+        "sourceUrl": "https://github.com/MarcFauser/jellyfin-plugin-nfo-custom-merge-id/releases/download/v12.0.0.0/jellyfin-plugin-nfo-custom-merge-id_12.0.0.0.zip",
+        "checksum": "289beb102363426e7c037792f590fd70",
+        "changelog": "",
+        "timestamp": "2026-09-02T10:28:35Z"
+      },
+      {
+        "version": "11.0.0.0",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/MarcFauser/jellyfin-plugin-nfo-custom-merge-id/releases/download/v11.0.0.0/jellyfin-plugin-nfo-custom-merge-id_11.0.0.0.zip",
+        "checksum": "4c7c4aba69ec915ed9817e17996de0c1",
+        "changelog": "",
+        "timestamp": "2026-09-02T10:28:35Z"
+      }
+    ]
+  }
+]

@@ -103,11 +103,34 @@ Notes:
 ## Building
 
 ```powershell
+./build.ps1
+```
+
+Publishes both target frameworks, writes the `meta.json` that Jellyfin's `PluginManager`
+reads from the plugin folder, and packs one installable ZIP per Jellyfin line into `dist\`.
+`net9.0` is the Jellyfin 10.11 build, `net10.0` the Jellyfin 12 one - both from the same
+source, with the major version of the assembly saying which line a build belongs to.
+
+The artifacts are reproducible: the timestamp and the archive entry times are pinned to the
+last commit that touched the plugin, so an unchanged source rebuilds to the same bytes and a
+published release keeps its checksum. Measured, not assumed - two runs gave the same MD5.
+
+For a plain compile without packaging:
+
+```powershell
 dotnet build Jellyfin.Plugin.NfoCustomMergeId.slnx -c Release
 ```
 
-`net9.0` is the Jellyfin 10.11 build, `net10.0` the Jellyfin 12 one. Both come from the same
-source; the major version of the assembly says which line a build belongs to.
+## Installing
+
+Extract the ZIP for your line into `<ProgramDataPath>/plugins/NFO Custom Merge ID_<version>/`
+on the server and restart it; `GET /System/Info` reports the `ProgramDataPath`.
+
+`./build.ps1 -Changelog '...' -Publish` instead creates one GitHub release per artifact and
+pushes `manifest.json`, which is the file a plugin repository URL points at. The releases go
+first and the manifest only after the uploaded files have been fetched back and hashed: a
+release nobody's manifest names is merely invisible, but a manifest entry without its release
+is a failed download in someone's dashboard.
 
 ## Status
 

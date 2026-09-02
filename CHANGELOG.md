@@ -40,6 +40,30 @@ The major version encodes the Jellyfin line a build belongs to: **11.x** for Jel
   refresh the Zap2It value was on the item and none of the other three were - so the file
   was read, and the three were genuinely ignored rather than the file skipped.
 
+- **A build and release path, so the plugin can actually be installed.** `build.ps1` publishes
+  both target frameworks, writes the `meta.json` that Jellyfin's `PluginManager` reads from the
+  plugin folder, packs one ZIP per Jellyfin line into `dist\`, and maintains `manifest.json`.
+  Until now there was source but no artifact - and without a `meta.json` beside the assembly
+  the server does not load a plugin at all.
+  - **Taken from the sibling plugins in this family rather than written fresh**, because the
+    guards in it were paid for there: one version means one artifact, a run that will be
+    refused must not leave a rewritten manifest behind, and a rebuild without `-Changelog`
+    must not blank the catalogue text of a version that already has one. Where a comment
+    reports something that happened, it now names the project it happened in - an inherited
+    justification reading as if it had been measured here would be worse than none.
+  - **`category` is `MoviesAndShows`, and that is measured.** The value looks like free text
+    and is not: the official catalogue
+    (`repo.jellyfin.org/files/plugin/manifest.json`, 34 packages) uses only Administration,
+    General, MoviesAndShows, Music, Anime, Books, LiveTV and Subtitles. The plausible-looking
+    `Metadata` belongs to no filter at all.
+  - **Angle brackets in the catalogue text are safe.** `<customid>` appears verbatim in the
+    description; `jellyfin-web` on `release-10.11.z` renders it as plain JSX text in
+    `plugin.tsx`, so React escapes it rather than swallowing it as an unknown tag.
+  - **One check added beyond the inherited set**, and forced to fire rather than trusted:
+    every assembly named in `meta.json` must be present in the package. Pointed at a
+    deliberately missing name it aborts; on the real build it passes. A typo there would
+    otherwise produce a plugin that installs and then does nothing.
+
 ### Fixed
 - **The `pre-commit` hook could not fire.** It came over with the rest of the scaffolding
   and its path filter still read `^Jellyfin\.Plugin\.JFLint/.*\.(cs|csproj)$` - a path this
