@@ -23,6 +23,7 @@
         "changelog": "First release. Registers MetadataProvider.Custom as an external id, so a customid element in a tvshow.nfo is read instead of being silently dropped. Series that must stay apart get different values, release folders that belong together get the same one - and because the value lives on disk, the decision survives a rebuild of the database. Applies to series, and needs the library option for automatic series grouping.",
         "timestamp": "2026-09-02T10:28:35Z"
       }
-    ]
+    ],
+    "imageUrl": "https://raw.githubusercontent.com/MarcFauser/jellyfin-plugin-nfo-custom-merge-id/main/logo.svg"
   }
 ]

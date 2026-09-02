@@ -74,6 +74,12 @@ The major version encodes the Jellyfin line a build belongs to: **11.x** for Jel
       the package checks, so it aborts first and the new check never runs. A red run proves
       the guard that actually fired, which is not necessarily the one under test.
 
+- **A catalogue tile.** `logo.svg` shows the two release folders as two cards held together by
+  a clasp, framed by angle brackets - which is the whole plugin in one picture. Flat colours
+  rather than a gradient, because the thing has to survive being drawn at 48 px; checked at
+  256, 96 and 48 before it was committed. `build.ps1` picks up any `logo.*` beside it and
+  writes `imageUrl` into the manifest, so no release had to be rebuilt for this: the logo is
+  not part of the ZIP.
 - **The upstream reports are linked rather than asserted.**
   [#17769](https://github.com/jellyfin/jellyfin/issues/17769) is the gap this plugin closes -
   `MetadataProvider.Custom` documented as the merge override and unreachable from an NFO.
