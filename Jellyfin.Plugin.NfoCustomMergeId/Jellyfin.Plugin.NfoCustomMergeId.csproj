@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- net9.0 is not a preference but a constraint: Jellyfin 10.11 runs on the .NET 9
+         runtime and cannot load a net10.0 assembly. net10.0 targets the v12 line. -->
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+    <RootNamespace>Jellyfin.Plugin.NfoCustomMergeId</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>false</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Reproducible artifacts: without these the SDK writes the HEAD commit into the
+         assembly and SourceLink writes it into the PDB, so a commit that only touches the
+         README still changes the DLL - which invalidates the checksum of a release that is
+         already published. Copied from the JFLint project, where both channels were
+         measured. -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
+    <PathMap>$(MSBuildProjectDirectory)=/_/</PathMap>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <!-- Jellyfin's own ruleset, taken verbatim from jellyfin-plugin-template: it turns off
+         the StyleCop rules that contradict Jellyfin's house style and sharpens six CA rules
+         to Error. Everything not listed there still fails the build. -->
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)..\jellyfin.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <!-- The major version encodes the Jellyfin line this build belongs to: 11.x for
+       Jellyfin 10.11, 12.x for Jellyfin 12. No version number may appear twice in a
+       repository manifest, and a server moving from 10.11 to 12 has to see the matching
+       build as the higher number. -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <Version>11.0.0.0</Version>
+    <AssemblyVersion>11.0.0.0</AssemblyVersion>
+    <FileVersion>11.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <Version>12.0.0.0</Version>
+    <AssemblyVersion>12.0.0.0</AssemblyVersion>
+    <FileVersion>12.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <!-- ExcludeAssets="runtime": the server ships these assemblies itself, the plugin must
+       not place copies next to its own DLL. No Jellyfin.Database.Implementations here -
+       this plugin never touches the database. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Jellyfin.Controller" Version="10.11.11" ExcludeAssets="runtime" />
+    <PackageReference Include="Jellyfin.Model" Version="10.11.11" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Jellyfin.Controller" Version="12.0.0-rc3" ExcludeAssets="runtime" />
+    <PackageReference Include="Jellyfin.Model" Version="12.0.0-rc3" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
