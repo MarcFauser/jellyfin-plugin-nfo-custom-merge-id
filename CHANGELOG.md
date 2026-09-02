@@ -89,6 +89,26 @@ The major version encodes the Jellyfin line a build belongs to: **11.x** for Jel
   visible in the log. Both open. A claim of "reported upstream" that cannot be looked up is
   indistinguishable from an unsupported one.
 
+- **Verified on a live server, not only built.** Installed on Jellyfin 10.11.11 on
+  2026-09-02, in three steps, each one answering a question the previous one could not.
+  - **Is the registration picked up at all?** `GET /Items/{id}/ExternalIdInfos` on a series
+    returned **6** entries before the install and **7** after, the new one being
+    `Key=Custom  Name=Custom Merge ID`. So Jellyfin discovers an `IExternalId` from a plugin
+    assembly by itself - no `IPluginServiceRegistrator` needed, which until then was read in
+    the source rather than measured.
+  - **Is the element read?** `<customid>v-1984-final-battle</customid>` written into a
+    `tvshow.nfo`, then a refresh: `ProviderIds` went from `Imdb=… Tmdb=…` to
+    `Custom=v-1984-final-battle Imdb=… Tmdb=…`. A positive result needs no positive control
+    - the control is only owed for a negative one, which is why the earlier measurement
+    carried a `<zap2itid>` and this one did not.
+  - **Does it actually override?** This is the step that could have been skipped and would
+    have proved nothing if it had been. Two folders were given **the same** `<tvdbid>-1</tvdbid>`
+    on purpose - the exact collision that had merged them into one series the night before -
+    while their `customid` values differed. They stayed separate, stable across three
+    consecutive polls. Without that collision both would have stayed separate anyway, and
+    "they are separate" would have measured nothing at all. The planted `-1` was removed
+    afterwards and the item rebuilt to clear it, file count and bytes unchanged.
+
 ### Fixed
 - **The `pre-commit` hook could not fire.** It came over with the rest of the scaffolding
   and its path filter still read `^Jellyfin\.Plugin\.JFLint/.*\.(cs|csproj)$` - a path this
