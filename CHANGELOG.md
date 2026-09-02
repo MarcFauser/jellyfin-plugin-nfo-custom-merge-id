@@ -56,6 +56,20 @@ The major version encodes the Jellyfin line a build belongs to: **11.x** for Jel
     (`repo.jellyfin.org/files/plugin/manifest.json`, 34 packages) uses only Administration,
     General, MoviesAndShows, Music, Anime, Books, LiveTV and Subtitles. The plausible-looking
     `Metadata` belongs to no filter at all.
+    - **Now a `ValidateSet` parameter rather than a literal**, so that mistake fails before
+      the build instead of silently in the catalogue. Suggested by the Poster Overlays
+      session after this measurement reached it.
+    - **And the literal it replaced could never have been corrected anyway.** The package
+      header is inherited from the existing `manifest.json` (`$package = $loaded[0]`); the
+      literal in the `else` branch only applies when no manifest exists yet. Measured rather
+      than believed: the header was set to `General` by hand and a rebuild left it `General`.
+      It is now written on every run, like `owner` - the same trap that one had already
+      sprung. Changing only the header is free, incidentally: it is not in the ZIP, so the
+      published checksums stayed identical across the whole experiment.
+    - The copy inside `meta.json` is never displayed at all - `PluginInfo`, what
+      `GET /Plugins` returns, has no category field (read at `release-10.11.z`: Name, Version,
+      ConfigurationFileName, Description, Id, CanUninstall, HasImage, Status). It travels in
+      the ZIP though, so changing *that* one after a release would cost a new version.
   - **Angle brackets in the catalogue text are safe.** `<customid>` appears verbatim in the
     description; `jellyfin-web` on `release-10.11.z` renders it as plain JSX text in
     `plugin.tsx`, so React escapes it rather than swallowing it as an unknown tag.

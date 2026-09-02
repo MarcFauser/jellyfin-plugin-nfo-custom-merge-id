@@ -56,6 +56,14 @@ param(
     # only thing $RepoOwner should build; the official plugins put a readable name here.
     [string]$Developer = 'Marc Fauser',
 
+    # A ValidateSet rather than a string, because a wrong value fails silently: nothing
+    # validates it and the entry simply belongs to no catalogue filter. The eight are the
+    # complete set in use by the official catalogue (repo.jellyfin.org/files/plugin/manifest.json,
+    # 34 packages, measured 2026-09-02) - the plausible-looking "Metadata" is not among them and
+    # was in here until that measurement.
+    [ValidateSet('Administration', 'General', 'MoviesAndShows', 'Music', 'Anime', 'Books', 'LiveTV', 'Subtitles')]
+    [string]$Category = 'MoviesAndShows',
+
     # Create the GitHub releases and push manifest.json. Without this the build stays
     # entirely local and nothing becomes visible to anyone.
     [switch]$Publish
@@ -253,12 +261,14 @@ foreach ($t in $targets)
                       'can then be forced apart or held together from disk, and the decision survives a ' +
                       'rebuild of the database.'
         owner       = $Developer
-        # Not free text, even though nothing enforces it. Measured against the official
-        # catalogue (repo.jellyfin.org/files/plugin/manifest.json, 34 packages): the only
-        # values in use are Administration, General, MoviesAndShows, Music, Anime, Books,
-        # LiveTV and Subtitles. "Metadata" would have looked right and belonged to no
-        # existing filter - this plugin is about series, so MoviesAndShows it is.
-        category    = 'MoviesAndShows'
+        # This copy is never displayed - PluginInfo, what GET /Plugins returns for an
+        # installed plugin, has no category field at all (read at release-10.11.z: Name,
+        # Version, ConfigurationFileName, Description, Id, CanUninstall, HasImage, Status).
+        # The catalogue groups on the REPOSITORY manifest further down. It is written anyway
+        # because the two should not drift - but changing it after a release is not free:
+        # this copy travels inside the ZIP, so it changes the checksum and would need a new
+        # version number.
+        category    = $Category
         version     = $t.Version
         targetAbi   = $t.TargetAbi
         # 0 = PluginStatus.Active
@@ -329,6 +339,13 @@ if (Test-Path -LiteralPath $manifestPath)
     # inherited. Found the hard way in the Poster Overlays project: fixing $Developer alone
     # changed nothing at all.
     $package.owner = $Developer
+
+    # Same trap, same cure. THIS is the copy the catalogue groups on, and it was inherited
+    # too: measured 2026-09-02 by setting the header to General by hand and rebuilding - it
+    # came back General, so correcting the literal in the else branch below would have
+    # changed nothing once a manifest exists. Reported by the Poster Overlays session, then
+    # reproduced here rather than taken on trust.
+    $package.category = $Category
 }
 else
 {
@@ -342,7 +359,7 @@ else
                       'rebuild of the database.'
         overview    = 'Makes <customid> readable from a tvshow.nfo, so series grouping is decided on disk.'
         owner       = $Developer
-        category    = 'MoviesAndShows'
+        category    = $Category
         versions    = @()
     }
 }
