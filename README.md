@@ -95,6 +95,14 @@ Notes:
 - Applies to `Series`. Automatic grouping by provider id is a series behaviour, and it needs
   the library's **Automatic series grouping** switched on - without it,
   `CreatePresentationUniqueKey` never consults the ids at all.
+- **It would do nothing for films, and that is a property of the class tree rather than a
+  choice.** `Series` overrides `CreatePresentationUniqueKey` and returns `userdatakeys[0]`,
+  which is where a `<customid>` lands. `Movie` has no override at all: it inherits `Video`'s,
+  which returns `PrimaryVersionId` when a human has merged files as alternate versions, and
+  otherwise falls through to `BaseItem` - `Id.ToString("N")`, the item's own id. A film's
+  grouping key never looks at a provider id, so offering the field there would be a field
+  that lies. Read at `release-10.11.z`, after a neighbouring project measured the same thing
+  from the other side.
 - A refresh overwrites provider ids but never removes one. Changing a value takes effect;
   taking one away needs the metadata editor, or the item to be built again.
 - The value is opaque. A GUID works, and so does a readable slug - the second is easier to
