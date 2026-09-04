@@ -103,6 +103,22 @@ Notes:
   grouping key never looks at a provider id, so offering the field there would be a field
   that lies. Read at `release-10.11.z`, after a neighbouring project measured the same thing
   from the other side.
+- **Holding folders together works within one library, not across libraries of different
+  metadata language.** What `Series` returns is not the key itself but
+  `AddLibrariesToPresentationUniqueKey(userdatakeys[0])`, which appends the preferred
+  metadata language and the ids of every collection folder the series sits in:
+
+  ```csharp
+  var lang = GetPreferredMetadataLanguage();
+  if (!string.IsNullOrEmpty(lang)) { key += "-" + lang; }
+  var folders = LibraryManager.GetCollectionFolders(this).Select(i => i.Id.ToString("N")).ToArray();
+  return folders.Length == 0 ? key : key + "-" + string.Join('-', folders);
+  ```
+
+  Two series carrying the same `<customid>` in libraries of differing language therefore end
+  up with **different** presentation keys. For release folders of one show this rarely
+  matters - they normally live in the same library - but it is the kind of edge that costs an
+  afternoon if you meet it without knowing.
 - A refresh overwrites provider ids but never removes one. Changing a value takes effect;
   taking one away needs the metadata editor, or the item to be built again.
 - The value is opaque. A GUID works, and so does a readable slug - the second is easier to
