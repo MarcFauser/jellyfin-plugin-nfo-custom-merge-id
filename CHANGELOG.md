@@ -14,6 +14,25 @@ The major version encodes the Jellyfin line a build belongs to: **11.x** for Jel
 
 ## [Unreleased]
 
+### Changed
+- **12.0.1.0 links against Jellyfin 12.0.0 final instead of `12.0.0-rc3`.** The published
+  12.0.0.0 was built four release candidates before the final; it loads and runs on 12.0.0,
+  but linking a release build against a prerelease is not a state to leave standing. A new
+  version rather than a rebuild, because a published artifact is never replaced.
+  - **The plugin source is untouched** - only the package reference and the version moved.
+    Checked before touching anything: none of the v12 breaking changes reach this plugin.
+    `PrimaryVersionId`, `LinkedAlternateVersions`, `GetLinkedChildren`, `ISearchEngine`,
+    `IAuthenticationProvider`, `IItemRepository`, `IUserManager` and `Playlist` all score
+    zero across its three C# files, with a positive control in the same run. The release
+    note's warning about alternate versions and playlist contents does not apply here.
+  - **`IExternalId` is unchanged in v12**, which is what the build proves: against 12.0.0
+    final it compiles with 0 warnings under `TreatWarningsAsErrors` and
+    `AnalysisMode=AllEnabledByDefault`.
+  - **Built with `-Target net10.0` on purpose.** The timestamp in `meta.json` is pinned to
+    the last commit touching the plugin directory, so committing the project file moves it -
+    which would have changed the 11.0.0.0 archive too and invalidated a checksum that is
+    already published. Building only the affected line leaves that entry untouched.
+
 ### Added
 - **`<customid>` becomes readable from a `tvshow.nfo`.** The plugin registers
   `MetadataProvider.Custom` as an external id, and that is the whole of it: Jellyfin's NFO

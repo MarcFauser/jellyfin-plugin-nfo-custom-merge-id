@@ -34,10 +34,14 @@
     <FileVersion>11.0.0.0</FileVersion>
   </PropertyGroup>
 
+  <!-- 12.0.1.0 rather than a rebuild of 12.0.0.0: that artifact is published, and a
+       published artifact is never replaced. It was linked against 12.0.0-rc3, four release
+       candidates before the final, and only the reference changed here - the plugin source
+       is untouched. -->
   <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <Version>12.0.0.0</Version>
-    <AssemblyVersion>12.0.0.0</AssemblyVersion>
-    <FileVersion>12.0.0.0</FileVersion>
+    <Version>12.0.1.0</Version>
+    <AssemblyVersion>12.0.1.0</AssemblyVersion>
+    <FileVersion>12.0.1.0</FileVersion>
   </PropertyGroup>
 
   <!-- ExcludeAssets="runtime": the server ships these assemblies itself, the plugin must
@@ -49,8 +53,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <PackageReference Include="Jellyfin.Controller" Version="12.0.0-rc3" ExcludeAssets="runtime" />
-    <PackageReference Include="Jellyfin.Model" Version="12.0.0-rc3" ExcludeAssets="runtime" />
+    <PackageReference Include="Jellyfin.Controller" Version="12.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Jellyfin.Model" Version="12.0.0" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>
