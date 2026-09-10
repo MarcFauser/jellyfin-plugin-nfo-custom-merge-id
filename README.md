@@ -123,6 +123,20 @@ Notes:
   taking one away needs the metadata editor, or the item to be built again.
 - The value is opaque. A GUID works, and so does a readable slug - the second is easier to
   recognise in a diff a year later.
+- **Jellyfin 12 made this more useful, not less.** `Series.CreatePresentationUniqueKey` gained
+  a fallback: when `userdatakeys.Count` is not greater than 1 it no longer returns the item's
+  own id but `GetNameBasedGroupingKey()` - `"series-" + Name.ToLowerInvariant()`. Only `Imdb`,
+  `Tvdb` and `Custom` are inserted into that list (`Tmdb` is **not**), and the base list always
+  holds exactly one entry, the item id. So a series carrying nothing but a `<tmdbid>` has a
+  count of 1 and now groups **by name**:
+
+  | series without Imdb/Tvdb/Custom | 10.11 | 12 |
+  |---|---|---|
+  | grouping key | its own id - no grouping | `series-<name>` - grouped by name |
+
+  Two same-named shows that stayed apart under 10.11 can therefore merge under 12. A
+  `<customid>` raises the count above 1 and takes the fallback out of play, which is exactly
+  what this plugin is for. Read at `release-12.z`.
 
 ## Building
 
