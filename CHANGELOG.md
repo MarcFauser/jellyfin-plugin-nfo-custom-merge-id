@@ -28,6 +28,12 @@ The major version encodes the Jellyfin line a build belongs to: **11.x** for Jel
   - **`IExternalId` is unchanged in v12**, which is what the build proves: against 12.0.0
     final it compiles with 0 warnings under `TreatWarningsAsErrors` and
     `AnalysisMode=AllEnabledByDefault`.
+  - **And confirmed on the live v12 server after installing, in both directions**: the
+    *Custom Merge ID* field is offered on a **series** and is **absent on a film**. The
+    second half is the one that would have been left out, and without it the first only
+    shows that something registered - not that `Supports(item is Series)` actually filters.
+    A build proves the contract compiles; only the running server proves the plugin loads
+    and its registration is picked up.
   - **Built with `-Target net10.0` on purpose.** The timestamp in `meta.json` is pinned to
     the last commit touching the plugin directory, so committing the project file moves it -
     which would have changed the 11.0.0.0 archive too and invalidated a checksum that is

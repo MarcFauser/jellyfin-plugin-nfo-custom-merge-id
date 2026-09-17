@@ -6,7 +6,8 @@ one series is decided on disk instead of by whatever provider id happens to matc
 ## The problem
 
 Jellyfin merges series across folders by provider id, and the field it uses is not obvious.
-From `Series.cs`:
+From `Series.cs`, **as it stands on `release-10.11.z`** - v12 kept the id list unchanged and
+rewrote the fallback, which is a separate matter and is spelled out under Usage:
 
 ```csharp
 public override List<string> GetUserDataKeys()
@@ -38,7 +39,9 @@ Two consequences worth knowing before touching any NFO:
 - Two folders whose **TVDB** ids are equal are one series - including when that id is a
   placeholder such as `-1`. Nothing is logged, and the second entry simply stops existing.
 - A placeholder in `<tmdbid>`, `<anidbid>` or `<anilistid>` is harmless for grouping,
-  because those fields never form the key.
+  because those fields never form the key. **On v12 that is still true of the placeholder
+  and no longer true of the situation**: a series holding none of Imdb, Tvdb or Custom now
+  groups by name instead of staying alone. See the note under Usage.
 
 `Custom` is the intended lever. Its own enum says so:
 

@@ -11,7 +11,8 @@
     under dist\.
 
     net9.0  -> Jellyfin 10.11.x   (the .NET version is dictated by the server runtime)
-    net10.0 -> Jellyfin 12.x      (compiles, but untested - no v12 server here yet)
+    net10.0 -> Jellyfin 12.x      (running in production since 2026-09-10; 12.0.1.0 verified
+                                   on the live server, see CHANGELOG)
 
     Install a ZIP by extracting it into <ProgramDataPath>/plugins/NFO Custom Merge ID_<version>/
     on the server and restarting Jellyfin. The server's ProgramDataPath is shown by
