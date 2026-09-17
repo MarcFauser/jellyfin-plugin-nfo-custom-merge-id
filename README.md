@@ -162,6 +162,20 @@ For a plain compile without packaging:
 dotnet build Jellyfin.Plugin.NfoCustomMergeId.slnx -c Release
 ```
 
+## Tested on
+
+Built against and checked on a running server are two different claims, so they are listed
+apart - a build proves the contract compiles, only the server proves the registration is
+picked up:
+
+| line | built against | verified on a running server |
+|---|---|---|
+| 11.x (`net9.0`) | 10.11.11 | **10.11.11**, 2026-09-02 |
+| 12.x (`net10.0`) | 12.0.0 final | **12.1.0**, 2026-09-17 |
+
+The v12 check covered both directions: the *Custom Merge ID* field is offered on a series
+and absent on a film.
+
 ## Installing
 
 Extract the ZIP for your line into `<ProgramDataPath>/plugins/NFO Custom Merge ID_<version>/`
