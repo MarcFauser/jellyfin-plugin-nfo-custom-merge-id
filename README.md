@@ -112,9 +112,11 @@ Notes:
   metadata language and the ids of every collection folder the series sits in:
 
   ```csharp
+  // release-12.z; on release-10.11.z the same method lacks the .Order() line
   var lang = GetPreferredMetadataLanguage();
   if (!string.IsNullOrEmpty(lang)) { key += "-" + lang; }
-  var folders = LibraryManager.GetCollectionFolders(this).Select(i => i.Id.ToString("N")).ToArray();
+  var folders = LibraryManager.GetCollectionFolders(this).Select(i => i.Id.ToString("N"))
+                              .Order(StringComparer.Ordinal).ToArray();
   return folders.Length == 0 ? key : key + "-" + string.Join('-', folders);
   ```
 
@@ -122,6 +124,10 @@ Notes:
   up with **different** presentation keys. For release folders of one show this rarely
   matters - they normally live in the same library - but it is the kind of edge that costs an
   afternoon if you meet it without knowing.
+
+  The sorting is v12 only, and it matters for nobody reading this - except anyone comparing
+  keys captured on the older line, where the order is whatever `GetCollectionFolders`
+  happened to return.
 - A refresh overwrites provider ids but never removes one. Changing a value takes effect;
   taking one away needs the metadata editor, or the item to be built again.
 - The value is opaque. A GUID works, and so does a readable slug - the second is easier to
