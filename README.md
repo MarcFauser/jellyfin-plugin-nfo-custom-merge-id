@@ -202,11 +202,19 @@ were placed in one library location, **differently named** and carrying the **sa
 | 2 | plus the **same** `<customid>` | `Custom=…shared` on both | **1** - merged again |
 
 Measured **with a `userId`**, because `BaseItemRepository.EnableGroupByPresentationUniqueKey`
-returns false while `query.User is null`: without a user nothing is grouped at all, so the
-effect would have been structurally invisible and the run would still have looked clean. Both
-transitions showed up in the library total as well (533 → 534 → 535 → 534), and every state was
-polled until two consecutive probes agreed - a refresh is a process, and a single sample of one
-is a snapshot of it rather than of its result.
+returns false while `query.User is null`. What that switches off is the **collapsing of the
+answer**, not the key - the key is computed and stored either way. So a query without a user
+returns one row per release folder whatever the `<customid>` says, the effect would have been
+structurally invisible, and the run would still have looked clean.
+
+That cuts both ways, and the other direction is easy to get backwards: anything that builds the
+groups **itself** from the stored key wants the **ungrouped** view, because with a user every
+group has already collapsed to one row. Same switch, two different objects - which one you need
+depends on who is doing the grouping.
+
+Both transitions showed up in the library total as well (533 → 534 → 535 → 534), and every state
+was polled until two consecutive probes agreed - a refresh is a process, and a single sample of
+one is a snapshot of it rather than of its result.
 
 State 0 → 1 doubles as the v12 evidence for the read path itself: `Custom` reaches the items
 only because the plugin registers the id, and nothing but the NFO supplied the value.
