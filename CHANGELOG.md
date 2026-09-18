@@ -15,6 +15,33 @@ The major version encodes the Jellyfin line a build belongs to: **11.x** for Jel
 ## [Unreleased]
 
 ### Changed
+- **The grouping effect is measured on Jellyfin 12 now, not derived.** Until 2026-09-18 the
+  README rested on the source for v12: registration and the NFO read path were verified on a
+  running server, but that a `<customid>` actually *moves* the presentation key was measured
+  only on 10.11. Two throwaway release folders in one library location, differently named and
+  both carrying `<tvdbid>-1</tvdbid>`, produced three states in which nothing but the
+  `<customid>` ever changed - merged (1 tile), split by differing values (2), merged again by a
+  shared value (1), with the library total following at 534 / 535 / 534.
+  - **Measured with a `userId`**, because `EnableGroupByPresentationUniqueKey` returns false
+    while `query.User is null`. Without a user Jellyfin groups nothing at all, every folder
+    stands alone, and a run would report "they are separate" without the effect under test ever
+    having been in play.
+  - **Each state polled until two consecutive probes agreed.** A refresh is a process, so one
+    sample measures the progress rather than the result - the first probe after state 2 still
+    showed the previous values.
+  - **Removed afterwards and the removal checked**, not assumed: the series needed a second
+    round because a season had reappeared and the first delete answered 409. Series counts are
+    back at 1668 unmerged and 533 merged, and a path search that still finds other folders finds
+    nothing of the probe.
+  - **A natural control was in the library already**, found before anything was built: of 309
+    series groups sharing a Tvdb id, the 308 without a Custom id had all merged into one tile,
+    and the single group carrying one - the two Captain Future release folders, which share
+    `Tvdb=79033` and `tt0122336` in one library - had not.
+- **Correction in the README: "changing a value takes effect" was too generous.** With
+  `replaceAllMetadata=false` the merge only fills provider ids that are *missing*, so an edited
+  `<customid>` is read off disk and then dropped. Measured in the run above - the same refresh
+  that had just picked up a newly added value left an existing one untouched until the flag was
+  set. Adding, overwriting and removing are three cases, not two.
 - **12.0.1.0 links against Jellyfin 12.0.0 final instead of `12.0.0-rc3`.** The published
   12.0.0.0 was built four release candidates before the final; it loads and runs on 12.0.0,
   but linking a release build against a prerelease is not a state to leave standing. A new

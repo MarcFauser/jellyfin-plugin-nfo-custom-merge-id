@@ -128,8 +128,13 @@ Notes:
   The sorting is v12 only, and it matters for nobody reading this - except anyone comparing
   keys captured on the older line, where the order is whatever `GetCollectionFolders`
   happened to return.
-- A refresh overwrites provider ids but never removes one. Changing a value takes effect;
-  taking one away needs the metadata editor, or the item to be built again.
+- A refresh overwrites provider ids but never removes one - and **overwriting needs
+  `replaceAllMetadata=true`**. This line used to say "changing a value takes effect", which is
+  measurably too generous: with `replaceAllMetadata=false` the merge only fills ids that are
+  *missing*, so an edited `<customid>` is read off disk and then dropped. Measured on 12.1.0 -
+  the very refresh that had just picked up a newly added value left an existing one untouched
+  until the flag was set. Taking a value away is a third case again: that needs the metadata
+  editor, or the item to be built anew.
 - The value is opaque. A GUID works, and so does a readable slug - the second is easier to
   recognise in a diff a year later.
 - **Jellyfin 12 made this more useful, not less.** `Series.CreatePresentationUniqueKey` gained
@@ -177,10 +182,39 @@ picked up:
 | line | built against | verified on a running server |
 |---|---|---|
 | 11.x (`net9.0`) | 10.11.11 | **10.11.11**, 2026-09-02 |
-| 12.x (`net10.0`) | 12.0.0 final | **12.1.0**, 2026-09-17 |
+| 12.x (`net10.0`) | 12.0.0 final | **12.1.0**, 2026-09-17 and 2026-09-18 |
 
 The v12 check covered both directions: the *Custom Merge ID* field is offered on a series
 and absent on a film.
+
+### The grouping effect, measured on 12.1.0
+
+Being registered and being read is one claim; *moving the presentation key* is another, and on
+v12 that one had been read in the source rather than measured. Two throwaway release folders
+were placed in one library location, **differently named** and carrying the **same**
+`<tvdbid>-1</tvdbid>` - the collision described in #17770. Across the whole run only the
+`<customid>` ever changed; the folder names and the `-1` stayed put:
+
+| state | `tvshow.nfo` | provider ids on the items | tiles |
+|---|---|---|---|
+| 0 | `<tvdbid>-1</tvdbid>` only | `Tvdb=-1` | **1** - merged, exactly as #17770 describes |
+| 1 | plus **differing** `<customid>` | `Custom=…alpha` / `…beta` | **2** - split apart |
+| 2 | plus the **same** `<customid>` | `Custom=…shared` on both | **1** - merged again |
+
+Measured **with a `userId`**, because `BaseItemRepository.EnableGroupByPresentationUniqueKey`
+returns false while `query.User is null`: without a user nothing is grouped at all, so the
+effect would have been structurally invisible and the run would still have looked clean. Both
+transitions showed up in the library total as well (533 → 534 → 535 → 534), and every state was
+polled until two consecutive probes agreed - a refresh is a process, and a single sample of one
+is a snapshot of it rather than of its result.
+
+State 0 → 1 doubles as the v12 evidence for the read path itself: `Custom` reaches the items
+only because the plugin registers the id, and nothing but the NFO supplied the value.
+
+Both folders and both items were removed afterwards, in rounds, because the first attempt at
+the series returned 409 - a season had reappeared under it. The series counts came back to 1668
+unmerged and 533 merged, and a path search that demonstrably still finds other folders finds
+none of the probe.
 
 ## Installing
 
